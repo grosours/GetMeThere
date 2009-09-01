@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sqlite3
+import sys
 
 DB_FILE = 'ratp.db'
 
