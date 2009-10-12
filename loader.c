@@ -38,8 +38,6 @@ static int schedules_callback(void *void_node_list, int argc, char **argv, char 
 
     node_add_neighbour(start_node, end_node);
 
-    printf("Got schedule from %d to %d with line %d\n", atoi(argv[0]), atoi(argv[1]), atoi(argv[2]));
-
     return 0;
 }
 
@@ -97,8 +95,6 @@ int main(int argc, char **argv)
         node_list_free(node_list, 1);
         return 1;
     }
-
-    printf("Reading from database ok\n");
 
     node_list_free(node_list, 1);
 
