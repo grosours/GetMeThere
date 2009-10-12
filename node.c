@@ -17,6 +17,7 @@ struct node *node_new()
     node->name = NULL;
     node->name_length = 0;
     node->distance = INT_MAX;
+    node->visited = 0;
     node->neighbours = node_list_new();
 
     return node;
@@ -192,7 +193,7 @@ struct node *node_list_find_by_id(struct node_list *node_list, int id)
 
 static int name_criteria(struct node *node, void *void_name)
 {
-    return (0 == strncpy(node->name, (char *)void_name, node->name_length));
+    return (0 == strncmp(node->name, (char *)void_name, node->name_length));
 }
 
 struct node *node_list_find_by_name(struct node_list *node_list, char *name)

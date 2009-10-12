@@ -3,6 +3,6 @@
 
 #include "node.h"
 
-int find_path(struct node_list *node_list, struct node_list *path);
+int find_path(struct node_list *node_list, struct node_list *path, struct node *start_node, struct node *end_node);
 
 #endif
