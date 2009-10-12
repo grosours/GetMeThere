@@ -112,7 +112,7 @@ struct node *node_list_find_by_id(struct node_list *node_list, int id)
     struct node_list_item *current = NULL;
     struct node_list_item *next = NULL;
 
-    if(NULL == node_list) return;
+    if(NULL == node_list) return NULL;
     current = node_list->head;
 
     while(current != NULL) {
@@ -129,12 +129,12 @@ struct node *node_list_find_by_name(struct node_list *node_list, char *name)
     struct node_list_item *current = NULL;
     struct node_list_item *next = NULL;
 
-    if(NULL == node_list) return;
+    if(NULL == node_list) return NULL;
     current = node_list->head;
 
     while(current != NULL) {
         if(0 == strncpy(current->item->name, name, current->item->name_length)) {
-            return current;
+            return current->item;
         }
         next = current->next;
         current = next;

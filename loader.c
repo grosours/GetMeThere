@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <sqlite3.h>
 
-#include "path_finder.h"
+#include "loader.h"
 
 static int stations_callback(void *void_node_list, int argc, char **argv, char **column_name)
 {
