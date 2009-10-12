@@ -150,18 +150,18 @@ void node_list_map(struct node_list *node_list, void (*actor)(struct node_list_i
     }
 }
 
-static void node_list_append_actor(struct node_list_item *node_list_item, void *void_node_list)
+static void node_list_add_list_actor(struct node_list_item *node_list_item, void *void_node_list)
 {
     struct node_list *node_list = (struct node_list *)void_node_list;
     node_list_add(node_list, node_list_item->item);
 }
 
-void node_list_append(struct node_list *node_list, struct node_list *new_node_list)
+void node_list_add_list(struct node_list *node_list, struct node_list *new_node_list)
 {
     if(NULL == node_list) return;
     if(NULL == new_node_list) return;
 
-    node_list_map(node_list, node_list_append_actor, new_node_list);
+    node_list_map(node_list, node_list_add_list_actor, new_node_list);
 }
 
 struct node *node_list_find(struct node_list *node_list, int (*criteria)(struct node *, void *), void *data)

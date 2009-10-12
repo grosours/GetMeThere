@@ -31,7 +31,7 @@ void node_add_neighbour(struct node *node, struct node *neighbour);
 
 struct node_list *node_list_new();
 void node_list_free(struct node_list *node_list, int free_nodes);
-void node_list_append(struct node_list *node_list, struct node_list *new_node_list);
+void node_list_add_list(struct node_list *node_list, struct node_list *new_node_list);
 void node_list_map(struct node_list *node_list, void (*actor)(struct node_list_item *, void *), void *data);
 void node_list_add(struct node_list *node_list, struct node *node);
 void node_list_remove(struct node_list *node_list, struct node_list_item *node_list_item);

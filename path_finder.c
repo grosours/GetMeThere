@@ -42,7 +42,7 @@ int find_path(struct node_list *node_list, struct node_list *path, struct node *
     if(NULL == node_list->head) return 1;
 
     node_pool = node_list_new();
-    node_list_append(node_list, node_pool);
+    node_list_add_list(node_list, node_pool);
 
     /* Set the nodes distance */
     node_list_map(node_pool, set_initial_distance_actor, NULL);
