@@ -41,7 +41,7 @@ static int schedules_callback(void *void_node_list, int argc, char **argv, char 
     return 0;
 }
 
-int read_from_database(char *database_file_name, struct node_list **node_list)
+int read_from_database(char *database_file_name, struct node_list *node_list)
 {
     sqlite3 *db;
     char *error_msg = NULL;
@@ -57,7 +57,7 @@ int read_from_database(char *database_file_name, struct node_list **node_list)
 
     /* Get stations */
     error = sqlite3_exec(db, "select id, name from stations;",
-        stations_callback, *node_list, &error_msg);
+        stations_callback, node_list, &error_msg);
     if(error != SQLITE_OK)
     {
         printf("Could not get stations data from database\n");
@@ -65,7 +65,7 @@ int read_from_database(char *database_file_name, struct node_list **node_list)
     }
 
     /* Get schedules */
-    error = sqlite3_exec(db, "select start_station_id, end_station_id, line_id from schedules;", schedules_callback, *node_list, &error_msg);
+    error = sqlite3_exec(db, "select start_station_id, end_station_id, line_id from schedules;", schedules_callback, node_list, &error_msg);
     if(error != SQLITE_OK)
     {
         printf("Could not get schedules data from database\n");
@@ -80,23 +80,4 @@ out:
     if(NULL != error_msg) sqlite3_free(error_msg);
     sqlite3_close(db);
     return 1;
-}
-
-int main(int argc, char **argv)
-{
-    struct node_list *node_list = NULL;
-    int error;
-
-    node_list = node_list_new();
-    error = read_from_database("ratp.db", &node_list);
-    if(error)
-    {
-        printf("Could not read from database\n");
-        node_list_free(node_list, 1);
-        return 1;
-    }
-
-    node_list_free(node_list, 1);
-
-    return 0;
 }

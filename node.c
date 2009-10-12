@@ -107,6 +107,35 @@ void node_list_add(struct node_list *node_list, struct node *node)
     node_list_item->next = NULL;
 }
 
+void node_list_map(struct node_list *node_list, void (*actor)(struct node *, void *), void *data)
+{
+    struct node_list_item *current = NULL;
+    struct node_list_item *next = NULL;
+
+    if(NULL == node_list) return;
+    current = node_list->head;
+
+    while(current != NULL) {
+        actor(current->item, data);
+        next = current->next;
+        current = next;
+    }
+}
+
+static void node_list_append_actor(struct node *node, void *void_node_list)
+{
+    struct node_list *node_list = (struct node_list *)void_node_list;
+    node_list_add(node_list, node);
+}
+
+void node_list_append(struct node_list *node_list, struct node_list *new_node_list)
+{
+    if(NULL == node_list) return;
+    if(NULL == new_node_list) return;
+
+    node_list_map(node_list, node_list_append_actor, new_node_list);
+}
+
 struct node *node_list_find_by_id(struct node_list *node_list, int id)
 {
     struct node_list_item *current = NULL;
