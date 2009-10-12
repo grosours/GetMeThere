@@ -3,9 +3,14 @@
 
 struct node;
 
+struct node_list_item {
+    struct node *item;
+    struct node_list_item *next;
+};
+
 struct node_list {
-    struct node *head;
-    struct node *tail;
+    struct node_list_item *head;
+    struct node_list_item *tail;
 };
 
 struct node {
@@ -14,7 +19,6 @@ struct node {
     int name_length;
     int distance;
     struct node_list *neighbours;
-    struct node *next;
 };
 
 struct node *node_new();
@@ -23,7 +27,7 @@ void node_set_name(struct node *node, char *name);
 void node_add_neighbour(struct node *node, struct node *neighbour);
 
 struct node_list *node_list_new();
-void node_list_free(struct node_list *node_list);
+void node_list_free(struct node_list *node_list, int free_nodes);
 void node_list_add(struct node_list *node_list, struct node *node);
 struct node *node_list_find_by_id(struct node_list *node_list, int id);
 struct node *node_list_find_by_name(struct node_list *node_list, char *name);

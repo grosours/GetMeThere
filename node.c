@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <stdio.h>
 
 #include "node.h"
 
@@ -17,7 +18,6 @@ struct node *node_new()
     node->name_length = 0;
     node->distance = INT_MAX;
     node->neighbours = node_list_new();
-    node->next = NULL;
 
     return node;
 }
@@ -27,7 +27,7 @@ void node_free(struct node *node)
     if(NULL == node) return;
 
     if(NULL != node->name) free(node->name);
-    node_list_free(node->neighbours);
+    node_list_free(node->neighbours, 0);
     free(node);
 }
 
@@ -36,12 +36,9 @@ void node_set_name(struct node *node, char *name)
     if(NULL == node) return;
 
     if(NULL != node->name) free(node->name);
-    if(NULL == name)
-    {
+    if(NULL == name) {
         node->name = NULL;
-    }
-    else
-    {
+    } else {
         node->name_length = strlen(name);
         node->name = (char *)malloc(node->name_length * sizeof(char));
         assert(NULL != node->name);
@@ -56,7 +53,7 @@ void node_add_neighbour(struct node *node, struct node *neighbour)
     node_list_add(node->neighbours, neighbour);
 }
 
-/* Node list */
+/* Node node_list */
 
 struct node_list *node_list_new()
 {
@@ -71,17 +68,18 @@ struct node_list *node_list_new()
     return node_list;
 }
 
-void node_list_free(struct node_list *node_list)
+void node_list_free(struct node_list *node_list, int free_nodes)
 {
-    struct node *current = NULL;
-    struct node *next = NULL;
+    struct node_list_item *current = NULL;
+    struct node_list_item *next = NULL;
 
     if(NULL == node_list) return;
 
     current = node_list->head;
     while(current != NULL) {
         next = current->next;
-        node_free(current);
+        if(free_nodes) node_free(current->item);
+        free(current);
         current = next;
     }
 
@@ -90,25 +88,35 @@ void node_list_free(struct node_list *node_list)
 
 void node_list_add(struct node_list *node_list, struct node *node)
 {
+    struct node_list_item *node_list_item = NULL;
+
     if(NULL == node_list) return;
     if(NULL == node) return;
 
+    node_list_item = (struct node_list_item *)malloc(sizeof(struct node_list_item));
+    assert(NULL != node_list_item);
+    node_list_item->item = node;
+
     if(NULL == node_list->tail) {
-        node_list->head = node_list->tail = node;
-        node->next = NULL;
+        node_list->head = node_list->tail = node_list_item;
+    } else {
+        node_list->tail->next = node_list_item;
+        node_list->tail = node_list_item;
     }
+
+    node_list_item->next = NULL;
 }
 
 struct node *node_list_find_by_id(struct node_list *node_list, int id)
 {
-    struct node *current = NULL;
-    struct node *next = NULL;
+    struct node_list_item *current = NULL;
+    struct node_list_item *next = NULL;
 
     if(NULL == node_list) return;
     current = node_list->head;
 
     while(current != NULL) {
-        if(current->id == id) return current;
+        if(current->item->id == id) return current->item;
         next = current->next;
         current = next;
     }
@@ -118,14 +126,14 @@ struct node *node_list_find_by_id(struct node_list *node_list, int id)
 
 struct node *node_list_find_by_name(struct node_list *node_list, char *name)
 {
-    struct node *current = NULL;
-    struct node *next = NULL;
+    struct node_list_item *current = NULL;
+    struct node_list_item *next = NULL;
 
     if(NULL == node_list) return;
     current = node_list->head;
 
     while(current != NULL) {
-        if(0 == strncpy(current->name, name, current->name_length)) {
+        if(0 == strncpy(current->item->name, name, current->item->name_length)) {
             return current;
         }
         next = current->next;

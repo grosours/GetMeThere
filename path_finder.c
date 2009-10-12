@@ -4,17 +4,40 @@
 
 #include "path_finder.h"
 
-static int stations_callback(void *nodes, int argc, char **argv, char **column_name)
+static int stations_callback(void *void_node_list, int argc, char **argv, char **column_name)
 {
     struct node *node = NULL;
+    struct node_list *node_list = (struct node_list *)void_node_list;
 
-    printf("Got station %s with id %d\n", argv[1], atoi(argv[0]));
+    node = node_new();
+    node->id = atoi(argv[0]);
+    node_set_name(node, argv[1]);
+
+    node_list_add(node_list, node);
 
     return 0;
 }
 
-static int schedules_callback(void *nodes, int argc, char **argv, char **column_name)
+static int schedules_callback(void *void_node_list, int argc, char **argv, char **column_name)
 {
+    struct node_list *node_list = (struct node_list *)void_node_list;
+    struct node *start_node = NULL;
+    struct node *end_node = NULL;
+
+    start_node = node_list_find_by_id(node_list, atoi(argv[0]));
+    if(NULL == start_node) {
+        printf("Could not find start node with id %d\n", atoi(argv[0]));
+        return 1;
+    }
+
+    end_node = node_list_find_by_id(node_list, atoi(argv[1]));
+    if(NULL == end_node) {
+        printf("Could not find end node with id %d\n", atoi(argv[1]));
+        return 1;
+    }
+
+    node_add_neighbour(start_node, end_node);
+
     printf("Got schedule from %d to %d with line %d\n", atoi(argv[0]), atoi(argv[1]), atoi(argv[2]));
 
     return 0;
@@ -71,13 +94,13 @@ int main(int argc, char **argv)
     if(error)
     {
         printf("Could not read from database\n");
-        node_list_free(node_list);
+        node_list_free(node_list, 1);
         return 1;
     }
 
     printf("Reading from database ok\n");
 
-    node_list_free(node_list);
+    node_list_free(node_list, 1);
 
     return 0;
 }
