@@ -16,11 +16,16 @@ static int parse_cmdline(int argc, char **argv, char **start_station_str, char *
     return 0;
 }
 
+static void print_node_actor(struct node_list_item *node_list_item, void *void_format_string)
+{
+    char *format_string = (char *)void_format_string;
+    printf(format_string, node_list_item->item->name);
+}
+
 int main(int argc, char **argv)
 {
     struct node_list *node_list = NULL;
     struct node_list *path = NULL;
-    struct node_list_item *station = NULL;
     struct node *start_station = NULL;
     struct node *end_station = NULL;
     char *start_station_str = NULL;
@@ -66,11 +71,7 @@ int main(int argc, char **argv)
     }
 
     printf("Found the path:\n");
-    station = path->tail;
-    while(NULL != station) {
-        printf(" * %s\n", station->item->name);
-        station = station->previous;
-    }
+    node_list_map(path, print_node_actor, " * %s\n");
 
     node_list_free(node_list, 1);
 

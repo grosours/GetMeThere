@@ -87,6 +87,25 @@ void node_list_free(struct node_list *node_list, int free_nodes)
     free(node_list);
 }
 
+void node_list_reverse(struct node_list *node_list)
+{
+    struct node_list_item *current = NULL;
+    struct node_list_item *next = NULL;
+
+    if(NULL == node_list) return;
+    current = node_list->head;
+
+    node_list->head = node_list->tail;
+    node_list->tail = current;
+
+    while(current != NULL) {
+        next = current->next;
+        current->next = current->previous;
+        current->previous = next;
+        current = next;
+    }
+}
+
 void node_list_add(struct node_list *node_list, struct node *node)
 {
     struct node_list_item *node_list_item = NULL;

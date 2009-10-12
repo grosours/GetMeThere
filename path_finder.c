@@ -4,7 +4,7 @@
 
 #include "path_finder.h"
 
-void lowest_distance_actor(struct node_list_item *node_list_item, void *void_node_list_item_ptr)
+static void lowest_distance_actor(struct node_list_item *node_list_item, void *void_node_list_item_ptr)
 {
     struct node_list_item **current_node_list_item_ptr = (struct node_list_item **)void_node_list_item_ptr;
 
@@ -63,6 +63,7 @@ int find_path(struct node_list *node_list, struct node_list *path, struct node *
                 node_list_add(path, my_node);
                 my_node = my_node->previous;
             }
+            node_list_reverse(path);
 
             break;
         }
