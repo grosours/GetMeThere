@@ -99,7 +99,9 @@ void node_list_add(struct node_list *node_list, struct node *node)
 
     if(NULL == node_list->tail) {
         node_list->head = node_list->tail = node_list_item;
+        node_list_item->previous = NULL;
     } else {
+        node_list_item->previous = node_list->tail;
         node_list->tail->next = node_list_item;
         node_list->tail = node_list_item;
     }
@@ -107,7 +109,32 @@ void node_list_add(struct node_list *node_list, struct node *node)
     node_list_item->next = NULL;
 }
 
-void node_list_map(struct node_list *node_list, void (*actor)(struct node *, void *), void *data)
+void node_list_remove(struct node_list *node_list, struct node_list_item *node_list_item)
+{
+    if(NULL == node_list) return;
+    if(NULL == node_list->tail) return;
+    if(NULL == node_list_item) return;
+
+    if(node_list_item->previous) {
+        node_list_item->previous->next = node_list_item->next;
+    }
+
+    if(node_list_item->next) {
+        node_list_item->next->previous = node_list_item->previous;
+    }
+
+    if(node_list->head == node_list_item) {
+        node_list->head = node_list_item->next;
+    }
+
+    if(node_list->tail == node_list_item) {
+        node_list->tail = node_list_item->previous;
+    }
+
+    free(node_list_item);
+}
+
+void node_list_map(struct node_list *node_list, void (*actor)(struct node_list_item *, void *), void *data)
 {
     struct node_list_item *current = NULL;
     struct node_list_item *next = NULL;
@@ -116,16 +143,16 @@ void node_list_map(struct node_list *node_list, void (*actor)(struct node *, voi
     current = node_list->head;
 
     while(current != NULL) {
-        actor(current->item, data);
+        actor(current, data);
         next = current->next;
         current = next;
     }
 }
 
-static void node_list_append_actor(struct node *node, void *void_node_list)
+static void node_list_append_actor(struct node_list_item *node_list_item, void *void_node_list)
 {
     struct node_list *node_list = (struct node_list *)void_node_list;
-    node_list_add(node_list, node);
+    node_list_add(node_list, node_list_item->item);
 }
 
 void node_list_append(struct node_list *node_list, struct node_list *new_node_list)
@@ -136,7 +163,7 @@ void node_list_append(struct node_list *node_list, struct node_list *new_node_li
     node_list_map(node_list, node_list_append_actor, new_node_list);
 }
 
-struct node *node_list_find_by_id(struct node_list *node_list, int id)
+struct node *node_list_find(struct node_list *node_list, int (*criteria)(struct node *, void *), void *data)
 {
     struct node_list_item *current = NULL;
     struct node_list_item *next = NULL;
@@ -145,7 +172,7 @@ struct node *node_list_find_by_id(struct node_list *node_list, int id)
     current = node_list->head;
 
     while(current != NULL) {
-        if(current->item->id == id) return current->item;
+        if(criteria(current->item, data)) return current->item;
         next = current->next;
         current = next;
     }
@@ -153,21 +180,22 @@ struct node *node_list_find_by_id(struct node_list *node_list, int id)
     return NULL;
 }
 
+static int id_criteria(struct node *node, void *void_id)
+{
+    return (node->id == (int)void_id);
+}
+
+struct node *node_list_find_by_id(struct node_list *node_list, int id)
+{
+    return node_list_find(node_list, id_criteria, (void *)id);
+}
+
+static int name_criteria(struct node *node, void *void_name)
+{
+    return (0 == strncpy(node->name, (char *)void_name, node->name_length));
+}
+
 struct node *node_list_find_by_name(struct node_list *node_list, char *name)
 {
-    struct node_list_item *current = NULL;
-    struct node_list_item *next = NULL;
-
-    if(NULL == node_list) return NULL;
-    current = node_list->head;
-
-    while(current != NULL) {
-        if(0 == strncpy(current->item->name, name, current->item->name_length)) {
-            return current->item;
-        }
-        next = current->next;
-        current = next;
-    }
-
-    return NULL;
+    return node_list_find(node_list, name_criteria, (void *)name);
 }
