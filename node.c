@@ -17,6 +17,7 @@ struct node *node_new()
     node->name = NULL;
     node->distance = INT_MAX;
     node->visited = 0;
+    node->previous = NULL;
     node->neighbours = node_list_new();
 
     return node;
@@ -33,7 +34,7 @@ void node_free(struct node *node)
 
 void node_set_name(struct node *node, char *name)
 {
-    int name_length;
+    size_t name_length;
 
     if(NULL == node) return;
 
@@ -78,9 +79,9 @@ void node_list_free(struct node_list *node_list, int free_nodes)
     if(NULL == node_list) return;
 
     current = node_list->head;
-    while(current != NULL) {
+    while(NULL != current) {
         next = current->next;
-        if(free_nodes) node_free(current->item);
+        if(0 != free_nodes) node_free(current->item);
         free(current);
         current = next;
     }
@@ -99,7 +100,7 @@ void node_list_reverse(struct node_list *node_list)
     node_list->head = node_list->tail;
     node_list->tail = current;
 
-    while(current != NULL) {
+    while(NULL != current) {
         next = current->next;
         current->next = current->previous;
         current->previous = next;
@@ -163,7 +164,7 @@ void node_list_map(struct node_list *node_list, void (*actor)(struct node_list_i
     if(NULL == node_list) return;
     current = node_list->head;
 
-    while(current != NULL) {
+    while(NULL != current) {
         actor(current, data);
         next = current->next;
         current = next;
@@ -192,7 +193,7 @@ struct node *node_list_find(struct node_list *node_list, int (*criteria)(struct 
     if(NULL == node_list) return NULL;
     current = node_list->head;
 
-    while(current != NULL) {
+    while(NULL != current) {
         if(criteria(current->item, data)) return current->item;
         next = current->next;
         current = next;
