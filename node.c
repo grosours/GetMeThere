@@ -15,7 +15,6 @@ struct node *node_new()
 
     node->id = -1;
     node->name = NULL;
-    node->name_length = 0;
     node->distance = INT_MAX;
     node->visited = 0;
     node->neighbours = node_list_new();
@@ -34,16 +33,18 @@ void node_free(struct node *node)
 
 void node_set_name(struct node *node, char *name)
 {
+    int name_length;
+
     if(NULL == node) return;
 
     if(NULL != node->name) free(node->name);
     if(NULL == name) {
         node->name = NULL;
     } else {
-        node->name_length = strlen(name);
-        node->name = (char *)malloc(node->name_length * sizeof(char));
+        name_length = strlen(name) + 1;
+        node->name = (char *)malloc(name_length * sizeof(char));
         assert(NULL != node->name);
-        strncpy(node->name, name, node->name_length);
+        strncpy(node->name, name, name_length);
     }
 }
 
@@ -212,7 +213,7 @@ struct node *node_list_find_by_id(struct node_list *node_list, int id)
 
 static int name_criteria(struct node *node, void *void_name)
 {
-    return (0 == strncmp(node->name, (char *)void_name, node->name_length));
+    return (0 == strcmp(node->name, (char *)void_name));
 }
 
 struct node *node_list_find_by_name(struct node_list *node_list, char *name)

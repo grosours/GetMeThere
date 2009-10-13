@@ -71,8 +71,9 @@ int main(int argc, char **argv)
     }
 
     printf("Found the path:\n");
-    node_list_map(path, print_node_actor, " * %s\n");
+    node_list_map(path, print_node_actor, (void *)" * %s\n");
 
+    node_list_free(path, 0);
     node_list_free(node_list, 1);
 
     return 0;

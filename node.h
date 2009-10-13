@@ -17,7 +17,6 @@ struct node_list {
 struct node {
     int id;
     char *name;
-    int name_length;
     int distance;
     int visited;
     struct node *previous;
